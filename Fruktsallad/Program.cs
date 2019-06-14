@@ -11,7 +11,7 @@ namespace Fruktsallad
         static Dictionary<string, double> shoppingList = new Dictionary<string, double>();
         static bool moreItems = true;
 
-
+        
         static void Main(string[] args)
         {
             bool anotherList = true;
