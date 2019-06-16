@@ -10,13 +10,37 @@ namespace Fruktsallad
     {
         static Dictionary<string, double> shoppingList = new Dictionary<string, double>();
         static bool moreItems = true;
+        static int storFruktsallad = 0;
 
         
         static void Main(string[] args)
         {
-            bool anotherList = true;
 
             StartProgram();
+            StartShopping();
+
+        }
+
+        private static void StartProgram()
+        {
+            string versionNumber = "1.0.0";
+            string author = "Mattias Berglund";
+            int copyrightYear = 2019;
+            string programName = "\"Inköpslista till fruktsallad\"";
+
+            Console.Write("Välkommen till ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(programName + ".");
+            Console.ResetColor();
+            Console.WriteLine($"© {copyrightYear} {author}, Version: {versionNumber}\n");
+
+            Console.WriteLine("Tryck på enter för att starta programmet.");
+            Console.ReadLine();
+        }
+
+        private static void StartShopping()
+        {
+            bool anotherList = true;
 
             // Keep creating new shopping lists until user is done.
             while (anotherList)
@@ -33,36 +57,18 @@ namespace Fruktsallad
                         {
                             shoppingList.Clear(); // If user wants to create a new blank list.
                         }
+                        storFruktsallad = 0;
                     }
                     Console.Clear();
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Hoppsan! Någonting gick fel, programmet avslutas.");
+                    Console.WriteLine("Hoppsan! Någonting oväntat gick fel, programmet avslutas.");
                     anotherList = false;
-                    Thread.Sleep(2000);
+                    Thread.Sleep(2500);
                 }
             }
-            
         }
-
-        private static void StartProgram()
-        {
-            string versionNumber = "1.0.0";
-            string author = "Mattias Berglund";
-            int copyrightYear = 2019;
-            string programName = "\"Inköpslista till fruktsallad\"";
-
-            Console.Write("Välkommen till ");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.WriteLine(programName + ".");
-            Console.ResetColor();
-            Console.WriteLine($"© {copyrightYear} {author}, Version: {versionNumber}\n");
-
-            Console.WriteLine("Tryck på en tangent för att starta programmet.");
-            Console.ReadLine();
-        }
-
 
         private static void CreateShoppingList()
         {
@@ -87,7 +93,6 @@ namespace Fruktsallad
                 Console.Clear();
             }
         }
-
 
         private static void AddItem()
         {
@@ -120,7 +125,7 @@ namespace Fruktsallad
                             {
                                 shoppingList.Remove(itemName);
                                 Console.WriteLine($"{itemName} har tagits bort från inköpslistan.");
-                                Thread.Sleep(1000);
+                                Thread.Sleep(1200);
                             }
                             Console.Clear();
                         }
@@ -134,13 +139,59 @@ namespace Fruktsallad
 
             if (itemName != "")
             {
-                Console.Write($"Vad kostar {itemName}? (kr) ");
-                while (!double.TryParse(Console.ReadLine().Trim().ToLower(), out itemPrice))
+                bool validInput = false;
+
+                while (!validInput)
                 {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Ogiltig input. Exempel på giltig input: 65,50 eller 73");
-                    Console.ResetColor();
                     Console.Write($"Vad kostar {itemName}? (kr): ");
+
+                    if (double.TryParse(Console.ReadLine().Trim().ToLower(), out itemPrice))
+                    {
+                        if (itemPrice < 0)
+                        {
+                            string message = $"Är du säker på att du får betalt för att köpa {itemName}? ";
+                            validInput = GetYesOrNoInput(message);
+                            if (validInput)
+                            {
+                                Console.WriteLine("Okej då...");
+                            }
+                        }
+                        else if (itemPrice == 0)
+                        {
+                            string message = $"Är du säker på att {itemName} är gratis? ";
+                            validInput = GetYesOrNoInput(message);
+                            if (validInput)
+                            {
+                                Console.WriteLine("Där skulle jag också vilja handla...");
+                                Thread.Sleep(1000);
+                            }
+                        }
+                        else if (itemPrice > 300)
+                        {
+                            string message = $"Är du säker på att {itemName} kostar så mycket? [ja/nej] ";
+                            validInput = GetYesOrNoInput(message);
+                            if (validInput && storFruktsallad == 0)
+                            {
+                                Console.WriteLine("Antingen så betalar du kraftigt överpris, eller så skall " +
+                                    "det bli en väldigt stor fruktsallad. Oavsett vilket så är jag glad över att det " +
+                                    "inte är jag som betalar.\n");
+                                storFruktsallad++;
+                                Thread.Sleep(1000);
+                                Console.Write("Tryck enter för att fortsätta...");
+                                Console.ReadLine();
+                            }
+                        }
+                        else
+                        {
+                            validInput = true;
+                        }
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Ogiltig input. Exempel på giltig input: 65,50 eller 73");
+                        Console.ResetColor();
+                    }
                 }
                 shoppingList.Add(itemName, itemPrice);
                 Console.WriteLine($"{itemName} för {itemPrice} kr tillagt.");
@@ -152,13 +203,12 @@ namespace Fruktsallad
             }
         }
 
-
         private static void ShowShoppingList()
         {
             if (shoppingList.Count() == 0)
             {
                 Console.WriteLine("Din inköpslista är tom.\n");
-                Console.WriteLine("Tryck på en tangent för att fortsätta...");
+                Console.WriteLine("Tryck på enter för att fortsätta...");
                 Console.ReadLine();
                 Console.Clear();
             }
@@ -169,12 +219,11 @@ namespace Fruktsallad
                     Console.WriteLine($"{keyValue.Key}: {keyValue.Value} kr");
                 }
                 Console.WriteLine();
-                Console.Write("Tryck på en tangent för att fortsätta...");
+                Console.Write("Tryck på enter för att fortsätta...");
                 Console.ReadLine();
                 Console.Clear();
             }
         }
-
 
         private static void ShowCommands()
         {
@@ -186,7 +235,6 @@ namespace Fruktsallad
                 "\n\t\t\t4. Om du vill ta bort en vara, skriv in namnet på varan igen." +
                 "\n\t\t\t5. Annars skriver du bara in varans namn för att lägga till i inköpslistan.\n");
         }
-
 
         private static bool GetYesOrNoInput(string inputMessage)
         {
@@ -222,7 +270,6 @@ namespace Fruktsallad
             }
         }
 
-
         private static void ReturnItems()
         {      
             try
@@ -245,7 +292,7 @@ namespace Fruktsallad
                 Console.ResetColor();
 
                 Console.WriteLine();
-                Console.Write("Tryck på en tangent för att fortsätta...");
+                Console.Write("Tryck på enter för att fortsätta...");
                 Console.ReadLine();
             }
             catch (Exception)
