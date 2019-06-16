@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-
+using System.Text.RegularExpressions;
 
 namespace Fruktsallad
 {
@@ -10,8 +10,7 @@ namespace Fruktsallad
     {
         static Dictionary<string, double> shoppingList = new Dictionary<string, double>();
         static bool moreItems = true;
-        static int storFruktsallad = 0;
-
+        static bool storFruktsallad = false;
         
         static void Main(string[] args)
         {
@@ -57,7 +56,7 @@ namespace Fruktsallad
                         {
                             shoppingList.Clear(); // If user wants to create a new blank list.
                         }
-                        storFruktsallad = 0;
+                        storFruktsallad = false;
                     }
                     Console.Clear();
                 }
@@ -170,12 +169,12 @@ namespace Fruktsallad
                         {
                             string message = $"Är du säker på att {itemName} kostar så mycket? [ja/nej] ";
                             validInput = GetYesOrNoInput(message);
-                            if (validInput && storFruktsallad == 0)
+                            if (validInput && storFruktsallad)
                             {
                                 Console.WriteLine("Antingen så betalar du kraftigt överpris, eller så skall " +
                                     "det bli en väldigt stor fruktsallad. Oavsett vilket så är jag glad över att det " +
                                     "inte är jag som betalar.\n");
-                                storFruktsallad++;
+                                storFruktsallad = true;
                                 Thread.Sleep(1000);
                                 Console.Write("Tryck enter för att fortsätta...");
                                 Console.ReadLine();
